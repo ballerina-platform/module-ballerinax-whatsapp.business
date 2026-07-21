@@ -14,34 +14,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Constants below are declared without an explicit `string` type so each retains its singleton
+// literal type; this also lets the message-type constants double as both a `'type` field's type
+// descriptor and its default value.
+
 // ── API Base URLs ───────────────────────────────────────────────────────────────
 
 # The default base URL for the Meta Graph API.
-const string DEFAULT_BASE_URL = "https://graph.facebook.com";
+const DEFAULT_BASE_URL = "https://graph.facebook.com";
 
 # The default Meta Graph API version path segment used for every request.
-const string DEFAULT_API_VERSION = "v23.0";
+const DEFAULT_API_VERSION = "v23.0";
 
 // ── Webhook Verification ────────────────────────────────────────────────────────
 
 # The header Meta signs every webhook request body with (HMAC-SHA256, keyed by the app secret).
-const string WEBHOOK_SIGNATURE_HEADER = "X-Hub-Signature-256";
+const WEBHOOK_SIGNATURE_HEADER = "X-Hub-Signature-256";
 
 # Query parameter carrying the subscription mode on the verification handshake.
-const string QUERY_PARAM_HUB_MODE = "hub.mode";
+const QUERY_PARAM_HUB_MODE = "hub.mode";
 
 # Query parameter carrying the verify token on the verification handshake.
-const string QUERY_PARAM_HUB_VERIFY_TOKEN = "hub.verify_token";
+const QUERY_PARAM_HUB_VERIFY_TOKEN = "hub.verify_token";
 
 # Query parameter carrying the challenge to be echoed back on the verification handshake.
-const string QUERY_PARAM_HUB_CHALLENGE = "hub.challenge";
+const QUERY_PARAM_HUB_CHALLENGE = "hub.challenge";
 
 # The `hub.mode` value Meta sends on a subscription verification handshake.
-const string HUB_MODE_SUBSCRIBE = "subscribe";
+const HUB_MODE_SUBSCRIBE = "subscribe";
 
 // ── Message Constants ───────────────────────────────────────────────────────────
-// Declared without an explicit `string` type so each constant retains its singleton literal
-// type, letting it double as both a `'type` field's type descriptor and its default value.
 
 # The `messaging_product` value on every outbound message and template.
 const MESSAGING_PRODUCT_WHATSAPP = "whatsapp";
@@ -76,63 +78,73 @@ const MESSAGE_TYPE_TEMPLATE = "template";
 // ── Webhook Field (Event Type) Constants ────────────────────────────────────────
 
 # Webhook field for inbound messages and message status updates.
-const string WEBHOOK_FIELD_MESSAGES = "messages";
+const WEBHOOK_FIELD_MESSAGES = "messages";
 
 # Webhook field for a WhatsApp Business Account review decision.
-const string WEBHOOK_FIELD_ACCOUNT_REVIEW_UPDATE = "account_review_update";
+const WEBHOOK_FIELD_ACCOUNT_REVIEW_UPDATE = "account_review_update";
 
 # Webhook field for a WhatsApp Business Account lifecycle update.
-const string WEBHOOK_FIELD_ACCOUNT_UPDATE = "account_update";
+const WEBHOOK_FIELD_ACCOUNT_UPDATE = "account_update";
 
 # Webhook field for a change in the account's business capability limits.
-const string WEBHOOK_FIELD_BUSINESS_CAPABILITY_UPDATE = "business_capability_update";
+const WEBHOOK_FIELD_BUSINESS_CAPABILITY_UPDATE = "business_capability_update";
 
 # Webhook field for a message template's quality score update.
-const string WEBHOOK_FIELD_MESSAGE_TEMPLATE_QUALITY_UPDATE = "message_template_quality_update";
+const WEBHOOK_FIELD_MESSAGE_TEMPLATE_QUALITY_UPDATE = "message_template_quality_update";
 
 # Webhook field for a message template's approval status update.
-const string WEBHOOK_FIELD_MESSAGE_TEMPLATE_STATUS_UPDATE = "message_template_status_update";
+const WEBHOOK_FIELD_MESSAGE_TEMPLATE_STATUS_UPDATE = "message_template_status_update";
 
 # Webhook field for a phone number's display name update.
-const string WEBHOOK_FIELD_PHONE_NUMBER_NAME_UPDATE = "phone_number_name_update";
+const WEBHOOK_FIELD_PHONE_NUMBER_NAME_UPDATE = "phone_number_name_update";
 
 # Webhook field for a phone number's messaging quality/tier update.
-const string WEBHOOK_FIELD_PHONE_NUMBER_QUALITY_UPDATE = "phone_number_quality_update";
+const WEBHOOK_FIELD_PHONE_NUMBER_QUALITY_UPDATE = "phone_number_quality_update";
 
 # Webhook field for a PIN change/reset security event.
-const string WEBHOOK_FIELD_SECURITY = "security";
+const WEBHOOK_FIELD_SECURITY = "security";
 
 # Webhook field for a message template's category update.
-const string WEBHOOK_FIELD_TEMPLATE_CATEGORY_UPDATE = "template_category_update";
+const WEBHOOK_FIELD_TEMPLATE_CATEGORY_UPDATE = "template_category_update";
 
 // ── Log Messages ────────────────────────────────────────────────────────────────
 
-const string LOG_WEBHOOK_POST_RECEIVED = "WhatsApp webhook POST received";
+const LOG_WEBHOOK_POST_RECEIVED = "WhatsApp webhook POST received";
 
 // ── Warning Messages ────────────────────────────────────────────────────────────
+// Reserved for conditions that are expected/benign and do not, by themselves, indicate lost data.
 
-const string WARN_PAYLOAD_READ_FAILED = "Failed to read WhatsApp webhook payload as text";
-const string WARN_SIGNATURE_VERIFICATION_FAILED =
+const WARN_SIGNATURE_VERIFICATION_FAILED =
     "WhatsApp webhook signature verification failed; rejecting notification";
-const string WARN_PAYLOAD_PARSE_FAILED = "Failed to parse WhatsApp webhook payload as JSON";
-const string WARN_NOTIFICATION_PARSE_FAILED = "Failed to parse WhatsApp webhook notification envelope";
-const string WARN_WEBHOOK_VALUE_PARSE_FAILED = "Failed to parse WhatsApp webhook event value; dropping notification";
-const string WARN_UNRECOGNIZED_WEBHOOK_FIELD = "Unrecognized WhatsApp webhook field; dropping notification";
+const WARN_UNRECOGNIZED_WEBHOOK_FIELD = "Unrecognized WhatsApp webhook field; dropping notification";
 
 // ── Error Messages ──────────────────────────────────────────────────────────────
+// Includes conditions where malformed data caused a webhook notification (or part of one) to be
+// silently dropped, in addition to the connector's own request/handler failures.
 
-const string ERR_ON_MESSAGES_HANDLER = "Error in onMessages handler";
-const string ERR_ON_ACCOUNT_REVIEW_UPDATE_HANDLER = "Error in onAccountReviewUpdate handler";
-const string ERR_ON_ACCOUNT_UPDATE_HANDLER = "Error in onAccountUpdate handler";
-const string ERR_ON_BUSINESS_CAPABILITY_UPDATE_HANDLER = "Error in onBusinessCapabilityUpdate handler";
-const string ERR_ON_MESSAGE_TEMPLATE_QUALITY_UPDATE_HANDLER = "Error in onMessageTemplateQualityUpdate handler";
-const string ERR_ON_MESSAGE_TEMPLATE_STATUS_UPDATE_HANDLER = "Error in onMessageTemplateStatusUpdate handler";
-const string ERR_ON_PHONE_NUMBER_NAME_UPDATE_HANDLER = "Error in onPhoneNumberNameUpdate handler";
-const string ERR_ON_PHONE_NUMBER_QUALITY_UPDATE_HANDLER = "Error in onPhoneNumberQualityUpdate handler";
-const string ERR_ON_SECURITY_HANDLER = "Error in onSecurity handler";
-const string ERR_ON_TEMPLATE_CATEGORY_UPDATE_HANDLER = "Error in onTemplateCategoryUpdate handler";
+const ERR_WEBHOOK_VERIFICATION_FAILED =
+    "Webhook verification failed: invalid hub.mode, hub.verify_token, or missing hub.challenge";
+const ERR_PAYLOAD_READ_FAILED = "Failed to read WhatsApp webhook payload as text";
+const ERR_PAYLOAD_PARSE_FAILED = "Failed to parse WhatsApp webhook payload as JSON";
+const ERR_NOTIFICATION_PARSE_FAILED = "Failed to parse WhatsApp webhook notification envelope";
+const ERR_WEBHOOK_VALUE_PARSE_FAILED = "Failed to parse WhatsApp webhook event value; dropping notification";
+const ERR_STATUS_UPDATE_MISSING_REQUIRED_FIELD =
+    "WhatsApp status update is missing a required field (id, status, or recipient_id); dropping status update";
+const ERR_INBOUND_MESSAGE_MISSING_REQUIRED_FIELD =
+    "WhatsApp inbound message is missing a required field (id, from, or type); dropping message";
+const ERR_ON_MESSAGES_HANDLER = "Error in onMessages handler";
+const ERR_ON_ACCOUNT_REVIEW_UPDATE_HANDLER = "Error in onAccountReviewUpdate handler";
+const ERR_ON_ACCOUNT_UPDATE_HANDLER = "Error in onAccountUpdate handler";
+const ERR_ON_BUSINESS_CAPABILITY_UPDATE_HANDLER = "Error in onBusinessCapabilityUpdate handler";
+const ERR_ON_MESSAGE_TEMPLATE_QUALITY_UPDATE_HANDLER = "Error in onMessageTemplateQualityUpdate handler";
+const ERR_ON_MESSAGE_TEMPLATE_STATUS_UPDATE_HANDLER = "Error in onMessageTemplateStatusUpdate handler";
+const ERR_ON_PHONE_NUMBER_NAME_UPDATE_HANDLER = "Error in onPhoneNumberNameUpdate handler";
+const ERR_ON_PHONE_NUMBER_QUALITY_UPDATE_HANDLER = "Error in onPhoneNumberQualityUpdate handler";
+const ERR_ON_SECURITY_HANDLER = "Error in onSecurity handler";
+const ERR_ON_TEMPLATE_CATEGORY_UPDATE_HANDLER = "Error in onTemplateCategoryUpdate handler";
+const ERR_ON_ERROR_HANDLER = "Error in onError handler";
 
 // ── Other Constants ─────────────────────────────────────────────────────────────
 
 # Default value for `ConnectionConfig.forwarded` — disables the `forwarded`/`x-forwarded` header.
-const string FORWARDED_DISABLE = "disable";
+const FORWARDED_DISABLE = "disable";

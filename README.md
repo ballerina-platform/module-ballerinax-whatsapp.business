@@ -117,7 +117,7 @@ listener whatsapp:Listener whatsappListener = new (
 
 #### Step 3: Implement the service
 
-`whatsapp:WhatsAppService` has exactly ten handlers, one per WhatsApp Business Cloud webhook field. Implement all of them — there is no catch-all, and a field outside this set is logged and dropped.
+`whatsapp:WhatsAppService` has ten possible handlers, one per WhatsApp Business Cloud webhook field — but unlike most Ballerina service types, none of them are required. Declare only the ones you care about; a field whose handler you did not declare (or a field outside this closed set) is logged and dropped rather than delivered anywhere. A compiler plugin validates every handler you do declare: its name must be one of the ten, its parameter must match the documented event type, and it must return `error?`.
 
 ```ballerina
 service whatsapp:WhatsAppService on whatsappListener {
@@ -128,39 +128,13 @@ service whatsapp:WhatsAppService on whatsappListener {
             // handle status updates: event.statuses
         }
     }
-    remote function onAccountReviewUpdate(whatsapp:AccountReviewUpdateEvent event) returns error? {
-        // handle an account review decision
-    }
-    remote function onAccountUpdate(whatsapp:AccountUpdateEvent event) returns error? {
-        // handle a WABA account update
-    }
-    remote function onBusinessCapabilityUpdate(whatsapp:BusinessCapabilityUpdateEvent event) returns error? {
-        // handle a messaging capability change
-    }
-    remote function onMessageTemplateQualityUpdate(whatsapp:MessageTemplateQualityUpdateEvent event)
-    returns error? {
-        // handle a template quality score change
-    }
-    remote function onMessageTemplateStatusUpdate(whatsapp:MessageTemplateStatusUpdateEvent event)
-    returns error? {
-        // handle a template approval/rejection
-    }
-    remote function onPhoneNumberNameUpdate(whatsapp:PhoneNumberNameUpdateEvent event) returns error? {
-        // handle a display name review decision
-    }
-    remote function onPhoneNumberQualityUpdate(whatsapp:PhoneNumberQualityUpdateEvent event) returns error? {
-        // handle a phone number quality update
-    }
     remote function onSecurity(whatsapp:SecurityEvent event) returns error? {
         // handle a PIN change/reset event
-    }
-    remote function onTemplateCategoryUpdate(whatsapp:TemplateCategoryUpdateEvent event) returns error? {
-        // handle a template category change
     }
 }
 ```
 
-See `examples/send-message` for a complete implementation of all ten handlers.
+See `examples/send-message` for a reference implementation of all ten handlers.
 
 #### Step 4: Run the Ballerina application
 
@@ -243,12 +217,13 @@ Execute the commands below to build from the source.
 
 ## Repository structure
 
-| Directory       | Contents                                                             |
-|------------------|------------------------------------------------------------------------|
-| `ballerina/`    | The Ballerina connector + webhook listener source and tests          |
-| `examples/`     | Runnable usage examples                                               |
-| `docs/setup/`   | Credential and webhook setup guide                                    |
-| `build-config/` | Build resources (the `Ballerina.toml` version template)              |
+| Directory           | Contents                                                                        |
+|----------------------|------------------------------------------------------------------------------------|
+| `ballerina/`        | The Ballerina connector + webhook listener source and tests                    |
+| `native/`           | The Java native module (reflective handler dispatch for `WhatsAppService`)     |
+| `compiler-plugin/`  | Validates `WhatsAppService` handler names, parameter types, and return types    |
+| `examples/`         | Runnable usage examples                                                         |
+| `build-config/`     | Build resources (the `Ballerina.toml`/`CompilerPlugin.toml` version templates)  |
 
 ## Contribute to Ballerina
 

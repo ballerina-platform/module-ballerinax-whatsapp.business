@@ -1,0 +1,6 @@
+[plugin]
+id = "whatsapp-business-compiler-plugin"
+class = "io.ballerinax.whatsapp.business.plugin.WhatsappBusinessCompilerPlugin"
+
+[[dependency]]
+path = "../compiler-plugin/build/libs/whatsapp.business-compiler-plugin-2.0.0.jar"

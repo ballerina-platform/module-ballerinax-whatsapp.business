@@ -29,9 +29,10 @@ public isolated client class Client {
     #
     # + config - The connection configuration, including the bearer-token auth
     # + serviceUrl - The Meta Graph API base URL
-    # + return - An error if initialization failed, otherwise `()`
+    # + return - A `whatsapp:Error` (specifically a `whatsapp:ClientError`) if initialization
+    #            failed, otherwise `()`
     public isolated function init(ConnectionConfig config, string serviceUrl = DEFAULT_BASE_URL)
-    returns error? {
+    returns Error? {
         http:ClientConfiguration httpClientConfig = {
             auth: config.auth,
             httpVersion: config.httpVersion,
@@ -53,7 +54,11 @@ public isolated client class Client {
             validation: config.validation,
             laxDataBinding: config.laxDataBinding
         };
-        self.clientEp = check new (serviceUrl, httpClientConfig);
+        http:Client|error clientEp = new (serviceUrl, httpClientConfig);
+        if clientEp is error {
+            return error ClientError("Failed to initialize the underlying HTTP client", clientEp);
+        }
+        self.clientEp = clientEp;
         self.apiVersion = config.apiVersion;
         self.accessToken = config.auth.token;
     }
@@ -62,10 +67,15 @@ public isolated client class Client {
     #
     # + phoneNumberId - The business phone number ID sending the message
     # + payload - The message to send
-    # + return - The send result, or an error
-    remote isolated function sendMessage(string phoneNumberId, Message payload) returns MessageResponsePayload|error {  
+    # + return - The send result, or a `whatsapp:Error` (specifically a `whatsapp:ClientError`)
+    remote isolated function sendMessage(string phoneNumberId, Message payload)
+    returns MessageResponsePayload|Error {
         string resourcePath = string `/${self.apiVersion}/${phoneNumberId}/messages`;
-        return self.clientEp->post(resourcePath, payload);
+        MessageResponsePayload|error response = self.clientEp->post(resourcePath, payload);
+        if response is error {
+            return error ClientError("Failed to send the message", response);
+        }
+        return response;
     }
 
     # Sends a pre-approved message template. Required to start a conversation, or to message a
@@ -73,20 +83,25 @@ public isolated client class Client {
     #
     # + phoneNumberId - The business phone number ID sending the message
     # + payload - The template message to send
-    # + return - The send result, or an error
+    # + return - The send result, or a `whatsapp:Error` (specifically a `whatsapp:ClientError`)
     remote isolated function sendTemplateMessage(string phoneNumberId, TemplateMessage payload)
-    returns MessageResponsePayload|error {
+    returns MessageResponsePayload|Error {
         string resourcePath = string `/${self.apiVersion}/${phoneNumberId}/messages`;
-        return self.clientEp->post(resourcePath, payload);
+        MessageResponsePayload|error response = self.clientEp->post(resourcePath, payload);
+        if response is error {
+            return error ClientError("Failed to send the template message", response);
+        }
+        return response;
     }
 
     # Uploads a file as a reusable media object.
     #
     # + phoneNumberId - The business phone number ID the media is uploaded against
     # + payload - The file to upload
-    # + return - The uploaded media's ID, or an error
+    # + return - The uploaded media's ID, or a `whatsapp:Error` (specifically a
+    #            `whatsapp:ClientError`)
     remote isolated function uploadMedia(string phoneNumberId, MediaUploadRequest payload)
-    returns MediaUploadResponse|error {
+    returns MediaUploadResponse|Error {
         string resourcePath = string `/${self.apiVersion}/${phoneNumberId}/media`;
         mime:Entity messagingProductPart = new;
         messagingProductPart.setContentDisposition(
@@ -100,37 +115,76 @@ public isolated client class Client {
 
         http:Request request = new;
         request.setBodyParts([messagingProductPart, filePart], contentType = mime:MULTIPART_FORM_DATA);
-        return self.clientEp->post(resourcePath, request);
+        MediaUploadResponse|error response = self.clientEp->post(resourcePath, request);
+        if response is error {
+            return error ClientError("Failed to upload the media", response);
+        }
+        return response;
     }
 
     # Retrieves a media object's metadata and a short-lived download URL.
     #
     # + mediaId - The media object's ID
-    # + return - The media's metadata and download URL, or an error
-    remote isolated function retrieveMediaUrl(string mediaId) returns MediaUrlResponse|error {
+    # + return - The media's metadata and download URL, or a `whatsapp:Error` (specifically a
+    #            `whatsapp:ClientError`)
+    remote isolated function retrieveMediaUrl(string mediaId) returns MediaUrlResponse|Error {
         string resourcePath = string `/${self.apiVersion}/${mediaId}`;
-        return self.clientEp->get(resourcePath);
+        MediaUrlResponse|error response = self.clientEp->get(resourcePath);
+        if response is error {
+            return error ClientError("Failed to retrieve the media URL", response);
+        }
+        return response;
     }
 
     # Downloads a media object's bytes. Fetches the metadata (via `retrieveMediaUrl`) and then the
     # signed download URL it returns, since the URL alone is short-lived and Meta still requires
     # bearer-token authentication to fetch it.
     #
+    # If you've already called `retrieveMediaUrl` yourself (e.g. to inspect the media's MIME type
+    # or size before deciding whether to download it), call `downloadMediaFromUrl` with its `url`
+    # field instead — this avoids the redundant `retrieveMediaUrl` call this function makes
+    # internally.
+    #
     # + mediaId - The media object's ID
-    # + return - The media's raw bytes, or an error
-    remote isolated function downloadMedia(string mediaId) returns byte[]|error {
+    # + return - The media's raw bytes, or a `whatsapp:Error` (specifically a `whatsapp:ClientError`)
+    remote isolated function downloadMedia(string mediaId) returns byte[]|Error {
         MediaUrlResponse mediaUrl = check self->retrieveMediaUrl(mediaId);
-        http:Client mediaClientEp = check new (mediaUrl.url, {auth: {token: self.accessToken}});
-        http:Response response = check mediaClientEp->get("");
-        return response.getBinaryPayload();
+        return self->downloadMediaFromUrl(mediaUrl.url);
+    }
+
+    # Downloads a media object's bytes from its signed download URL (a `MediaUrlResponse.url`, as
+    # returned by `retrieveMediaUrl`), without re-fetching the media's metadata. Use this when you
+    # already have the URL — e.g. after calling `retrieveMediaUrl` yourself — to avoid the
+    # redundant metadata call `downloadMedia` makes internally.
+    #
+    # + url - The signed download URL from a `MediaUrlResponse.url`
+    # + return - The media's raw bytes, or a `whatsapp:Error` (specifically a `whatsapp:ClientError`)
+    remote isolated function downloadMediaFromUrl(string url) returns byte[]|Error {
+        http:Client|error mediaClientEp = new (url, {auth: {token: self.accessToken}});
+        if mediaClientEp is error {
+            return error ClientError("Failed to initialize the media download client", mediaClientEp);
+        }
+        http:Response|error response = mediaClientEp->get("");
+        if response is error {
+            return error ClientError("Failed to download the media", response);
+        }
+        byte[]|error bytes = response.getBinaryPayload();
+        if bytes is error {
+            return error ClientError("Failed to read the downloaded media's bytes", bytes);
+        }
+        return bytes;
     }
 
     # Deletes a media object.
     #
     # + mediaId - The media object's ID
-    # + return - The delete result, or an error
-    remote isolated function deleteMedia(string mediaId) returns MediaDeleteResponse|error {
+    # + return - The delete result, or a `whatsapp:Error` (specifically a `whatsapp:ClientError`)
+    remote isolated function deleteMedia(string mediaId) returns MediaDeleteResponse|Error {
         string resourcePath = string `/${self.apiVersion}/${mediaId}`;
-        return self.clientEp->delete(resourcePath);
+        MediaDeleteResponse|error response = self.clientEp->delete(resourcePath);
+        if response is error {
+            return error ClientError("Failed to delete the media", response);
+        }
+        return response;
     }
 }

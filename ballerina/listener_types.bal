@@ -15,14 +15,16 @@
 // under the License.
 
 # Configuration for the WhatsApp Business Cloud webhook `Listener`.
-#
-# + verifyToken - The verification token configured in the Meta App dashboard. Matched against
-# `hub.verify_token` during the webhook subscription handshake before the `hub.challenge` is
-# echoed back.
-# + appSecret - The Meta app secret. Every inbound notification is authenticated by validating the
-# `X-Hub-Signature-256` header against the raw request body (HMAC-SHA256).
+@display {label: "Listener Config"}
 public type ListenerConfig record {|
+    # The verification token configured in the Meta App dashboard. Matched against
+    # `hub.verify_token` during the webhook subscription handshake before the `hub.challenge` is
+    # echoed back.
+    @display {label: "Verify Token"}
     string verifyToken;
+    # The Meta app secret. Every inbound notification is authenticated by validating the
+    # `X-Hub-Signature-256` header against the raw request body (HMAC-SHA256).
+    @display {label: "App Secret"}
     string appSecret;
 |};
 
@@ -39,9 +41,9 @@ public type InboundMessage record {|
     string 'from;
     string messageId;
     string messageType;
-    string? text = ();
-    string? timestamp = ();
-    string? contactName = ();
+    string text?;
+    string timestamp?;
+    string contactName?;
     json raw;
 |};
 
@@ -52,10 +54,10 @@ public type InboundMessage record {|
 # + message - A human-readable error message
 # + details - Further detail, if present
 public type MessageErrorDetail record {|
-    int? code = ();
-    string? title = ();
-    string? message = ();
-    string? details = ();
+    int code?;
+    string title?;
+    string message?;
+    string details?;
 |};
 
 # One outbound message status update, part of a `MessageStatusEvent` batch.
@@ -70,8 +72,8 @@ public type MessageStatusUpdate record {|
     string messageId;
     string status;
     string recipientId;
-    string? timestamp = ();
-    MessageErrorDetail[]? errors = ();
+    string timestamp?;
+    MessageErrorDetail[] errors?;
     json raw;
 |};
 
@@ -87,7 +89,7 @@ public type MessageStatusUpdate record {|
 public type MessagesEvent record {|
     string phoneNumberId;
     InboundMessage[] messages;
-    int? timestamp = ();
+    int timestamp?;
     json raw;
 |};
 
@@ -101,7 +103,7 @@ public type MessagesEvent record {|
 public type MessageStatusEvent record {|
     string phoneNumberId;
     MessageStatusUpdate[] statuses;
-    int? timestamp = ();
+    int timestamp?;
     json raw;
 |};
 
@@ -120,7 +122,7 @@ public type MessagesNotificationEvent MessagesEvent|MessageStatusEvent;
 public type AccountReviewUpdateEvent record {|
     string wabaId;
     string decision;
-    int? timestamp = ();
+    int timestamp?;
     json raw;
 |};
 
@@ -134,19 +136,19 @@ public type AccountReviewUpdateEvent record {|
 # + solutionId - The solution ID, if present
 # + solutionPartnerBusinessIds - The solution partner business IDs, if present
 public type AccountUpdateWabaInfo record {|
-    string? wabaId = ();
-    string? ownerBusinessId = ();
-    string? adAccountLinked = ();
-    string? partnerAppId = ();
-    string? solutionId = ();
-    string[]? solutionPartnerBusinessIds = ();
+    string wabaId?;
+    string ownerBusinessId?;
+    string adAccountLinked?;
+    string partnerAppId?;
+    string solutionId?;
+    string[] solutionPartnerBusinessIds?;
 |};
 
 # Policy violation details, present only for `ACCOUNT_VIOLATION` events.
 #
 # + violationType - The violation classification
 public type AccountUpdateViolationInfo record {|
-    string? violationType = ();
+    string violationType?;
 |};
 
 # Account disable/reinstate details, present only for `DISABLED_UPDATE` events.
@@ -154,8 +156,8 @@ public type AccountUpdateViolationInfo record {|
 # + wabaBanState - The current ban state
 # + wabaBanDate - The date the ban took effect
 public type AccountUpdateBanInfo record {|
-    string? wabaBanState = ();
-    string? wabaBanDate = ();
+    string wabaBanState?;
+    string wabaBanDate?;
 |};
 
 # WhatsApp Business app disconnection details.
@@ -163,8 +165,8 @@ public type AccountUpdateBanInfo record {|
 # + reason - The disconnection reason
 # + initiatedBy - Who/what initiated the disconnection
 public type AccountUpdateDisconnectionInfo record {|
-    string? reason = ();
-    string? initiatedBy = ();
+    string reason?;
+    string initiatedBy?;
 |};
 
 # A country exception to a rate-eligibility window.
@@ -172,8 +174,8 @@ public type AccountUpdateDisconnectionInfo record {|
 # + countryCode - The exception country's ISO code
 # + startTime - Unix epoch seconds the exception starts
 public type AccountUpdateExceptionCountry record {|
-    string? countryCode = ();
-    int? startTime = ();
+    string countryCode?;
+    int startTime?;
 |};
 
 # International rate eligibility timeline, present only for rate-related events.
@@ -181,8 +183,8 @@ public type AccountUpdateExceptionCountry record {|
 # + startTime - Unix epoch seconds the eligibility window starts
 # + exceptionCountries - Per-country exceptions to the window
 public type AccountUpdateRateEligibility record {|
-    int? startTime = ();
-    AccountUpdateExceptionCountry[]? exceptionCountries = ();
+    int startTime?;
+    AccountUpdateExceptionCountry[] exceptionCountries?;
 |};
 
 # Messaging volume pricing tier metadata, present only for tier-update events.
@@ -193,11 +195,11 @@ public type AccountUpdateRateEligibility record {|
 # + effectiveMonth - The month the tier takes effect
 # + region - The pricing region
 public type AccountUpdateVolumeTierInfo record {|
-    int? tierUpdateTime = ();
-    string? pricingCategory = ();
-    string? tier = ();
-    string? effectiveMonth = ();
-    string? region = ();
+    int tierUpdateTime?;
+    string pricingCategory?;
+    string tier?;
+    string effectiveMonth?;
+    string region?;
 |};
 
 # Business verification submission status, present only for partner-client certification events.
@@ -206,9 +208,9 @@ public type AccountUpdateVolumeTierInfo record {|
 # + status - The certification status
 # + rejectionReasons - Reasons for rejection, if rejected
 public type AccountUpdateCertificationInfo record {|
-    string? clientBusinessId = ();
-    string? status = ();
-    string[]? rejectionReasons = ();
+    string clientBusinessId?;
+    string status?;
+    string[] rejectionReasons?;
 |};
 
 # A single functional restriction, present only for `ACCOUNT_RESTRICTION` events.
@@ -217,9 +219,9 @@ public type AccountUpdateCertificationInfo record {|
 # + expiration - Unix epoch seconds the restriction expires
 # + remediation - Steps to remediate/lift the restriction
 public type AccountUpdateRestriction record {|
-    string? restrictionType = ();
-    int? expiration = ();
-    string? remediation = ();
+    string restrictionType?;
+    int expiration?;
+    string remediation?;
 |};
 
 # A WABA account-lifecycle or compliance change: verification, violations, partner changes,
@@ -242,16 +244,16 @@ public type AccountUpdateRestriction record {|
 public type AccountUpdateEvent record {|
     string wabaId;
     string event;
-    string? country = ();
-    AccountUpdateWabaInfo? wabaInfo = ();
-    AccountUpdateViolationInfo? violationInfo = ();
-    AccountUpdateBanInfo? banInfo = ();
-    AccountUpdateRateEligibility? rateEligibility = ();
-    AccountUpdateVolumeTierInfo? volumeTierInfo = ();
-    AccountUpdateCertificationInfo? certificationInfo = ();
-    AccountUpdateDisconnectionInfo? disconnectionInfo = ();
-    AccountUpdateRestriction[]? restrictions = ();
-    int? timestamp = ();
+    string country?;
+    AccountUpdateWabaInfo wabaInfo?;
+    AccountUpdateViolationInfo violationInfo?;
+    AccountUpdateBanInfo banInfo?;
+    AccountUpdateRateEligibility rateEligibility?;
+    AccountUpdateVolumeTierInfo volumeTierInfo?;
+    AccountUpdateCertificationInfo certificationInfo?;
+    AccountUpdateDisconnectionInfo disconnectionInfo?;
+    AccountUpdateRestriction[] restrictions?;
+    int timestamp?;
     json raw;
 |};
 
@@ -268,11 +270,11 @@ public type AccountUpdateEvent record {|
 # + raw - The raw `value` object as received
 public type BusinessCapabilityUpdateEvent record {|
     string wabaId;
-    int? maxDailyConversationsPerBusiness = ();
-    int? maxPhoneNumbersPerBusiness = ();
-    int? maxPhoneNumbersPerWaba = ();
-    int? maxDailyConversationsPerPhone = ();
-    int? timestamp = ();
+    int maxDailyConversationsPerBusiness?;
+    int maxPhoneNumbersPerBusiness?;
+    int maxPhoneNumbersPerWaba?;
+    int maxDailyConversationsPerPhone?;
+    int timestamp?;
     json raw;
 |};
 
@@ -293,7 +295,7 @@ public type MessageTemplateQualityUpdateEvent record {|
     string messageTemplateLanguage;
     string previousQualityScore;
     string newQualityScore;
-    int? timestamp = ();
+    int timestamp?;
     json raw;
 |};
 
@@ -301,7 +303,7 @@ public type MessageTemplateQualityUpdateEvent record {|
 #
 # + disableDate - The date the template was disabled
 public type MessageTemplateDisableInfo record {|
-    string? disableDate = ();
+    string disableDate?;
 |};
 
 # Present only for lock/unlock-style template status events.
@@ -309,8 +311,8 @@ public type MessageTemplateDisableInfo record {|
 # + title - A short title describing the event
 # + description - A longer description
 public type MessageTemplateOtherInfo record {|
-    string? title = ();
-    string? description = ();
+    string title?;
+    string description?;
 |};
 
 # Present only for `INVALID_FORMAT` template rejections.
@@ -318,8 +320,8 @@ public type MessageTemplateOtherInfo record {|
 # + reason - The detailed rejection reason
 # + recommendation - Guidance on how to correct the template
 public type MessageTemplateRejectionInfo record {|
-    string? reason = ();
-    string? recommendation = ();
+    string reason?;
+    string recommendation?;
 |};
 
 # A message template status change (approved, rejected, disabled, archived, unarchived, ...).
@@ -342,12 +344,12 @@ public type MessageTemplateStatusUpdateEvent record {|
     int messageTemplateId;
     string messageTemplateName;
     string messageTemplateLanguage;
-    string? reason = ();
-    string? messageTemplateCategory = ();
-    MessageTemplateDisableInfo? disableInfo = ();
-    MessageTemplateOtherInfo? otherInfo = ();
-    MessageTemplateRejectionInfo? rejectionInfo = ();
-    int? timestamp = ();
+    string reason?;
+    string messageTemplateCategory?;
+    MessageTemplateDisableInfo disableInfo?;
+    MessageTemplateOtherInfo otherInfo?;
+    MessageTemplateRejectionInfo rejectionInfo?;
+    int timestamp?;
     json raw;
 |};
 
@@ -365,8 +367,8 @@ public type PhoneNumberNameUpdateEvent record {|
     string displayPhoneNumber;
     string decision;
     string requestedVerifiedName;
-    string? rejectionReason = ();
-    int? timestamp = ();
+    string rejectionReason?;
+    int timestamp?;
     json raw;
 |};
 
@@ -385,10 +387,10 @@ public type PhoneNumberQualityUpdateEvent record {|
     string wabaId;
     string displayPhoneNumber;
     string event;
-    string? currentLimit = ();
-    string? oldLimit = ();
-    string? maxDailyConversationsPerBusiness = ();
-    int? timestamp = ();
+    string currentLimit?;
+    string oldLimit?;
+    string maxDailyConversationsPerBusiness?;
+    int timestamp?;
     json raw;
 |};
 
@@ -404,9 +406,22 @@ public type SecurityEvent record {|
     string wabaId;
     string displayPhoneNumber;
     string event;
-    string? requester = ();
-    int? timestamp = ();
+    string requester?;
+    int timestamp?;
     json raw;
+|};
+
+# Reports an error returned by another `WhatsAppService` handler while it was being invoked for an
+# incoming webhook notification. Delivered to `onError`, if declared.
+#
+# + 'error - The error the handler returned
+# + 'field - The webhook field being dispatched when the handler failed (e.g. `messages`,
+#            `account_update`)
+# + payload - The raw `value` object that was being dispatched, for diagnostics
+public type HandlerErrorEvent record {|
+    error 'error;
+    string 'field;
+    json payload;
 |};
 
 # A message template category change, either imminent (24-hour notice) or completed.
@@ -428,9 +443,9 @@ public type TemplateCategoryUpdateEvent record {|
     string messageTemplateName;
     string messageTemplateLanguage;
     string newCategory;
-    string? previousCategory = ();
-    string? correctCategory = ();
-    int? categoryUpdateTimestamp = ();
-    int? timestamp = ();
+    string previousCategory?;
+    string correctCategory?;
+    int categoryUpdateTimestamp?;
+    int timestamp?;
     json raw;
 |};

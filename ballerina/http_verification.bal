@@ -17,7 +17,7 @@
 import ballerina/crypto;
 import ballerina/lang.array;
 
-const string SIGNATURE_PREFIX = "sha256=";
+const SIGNATURE_PREFIX = "sha256=";
 
 # Verifies the `X-Hub-Signature-256` header against the raw webhook payload using HMAC-SHA256.
 #

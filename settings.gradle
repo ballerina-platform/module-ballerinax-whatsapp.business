@@ -43,9 +43,13 @@ def projectName = 'whatsapp.business'
 
 rootProject.name = 'module-ballerinax-whatsapp.business'
 
+include ":${projectName}-native"
+include ":${projectName}-compiler-plugin"
 include ":${projectName}-ballerina"
 include ":${projectName}-examples"
 
+project(":${projectName}-native").projectDir = file('native')
+project(":${projectName}-compiler-plugin").projectDir = file('compiler-plugin')
 project(":${projectName}-ballerina").projectDir = file('ballerina')
 project(":${projectName}-examples").projectDir = file('examples')
 

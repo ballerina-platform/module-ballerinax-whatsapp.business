@@ -48,6 +48,8 @@ allprojects {
 def moduleVersion = project.version.replace("-SNAPSHOT", "")
 
 tasks.named('build') {
+    dependsOn(":${packageName}-native:build")
+    dependsOn(":${packageName}-compiler-plugin:build")
     dependsOn(":${packageName}-ballerina:build")
     dependsOn(":${packageName}-examples:build")
 }

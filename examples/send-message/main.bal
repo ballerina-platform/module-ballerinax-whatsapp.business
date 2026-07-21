@@ -48,7 +48,7 @@ public function main() returns error? {
 
     whatsapp:MessageResponsePayload response = check whatsappClient->sendMessage(phoneNumberId, message);
 
-    var sentMessages = response?.messages;
+    whatsapp:SentMessage[]? sentMessages = response?.messages;
     if sentMessages is () || sentMessages.length() == 0 {
         log:printInfo(string `Message sent to ${mask(recipientNumber)} (no message ID returned).`);
     } else {

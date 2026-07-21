@@ -16,7 +16,7 @@ appSecret = "<META_APP_SECRET>"
 # apiVersion = "v23.0"   # optional
 ```
 
-See [`docs/setup`](../../docs/setup) for how to obtain these values.
+See the [Setup guide](../../README.md#setup-guide) for how to obtain these values.
 
 ## Run the example
 
