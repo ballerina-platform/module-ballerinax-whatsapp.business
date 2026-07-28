@@ -28,7 +28,7 @@ public type ListenerConfig record {|
     string appSecret;
 |};
 
-# One inbound WhatsApp message, part of a `MessagesEvent` batch.
+# One inbound WhatsApp message, part of a `Messages` batch.
 #
 # + 'from - The WhatsApp ID (phone number) of the sender
 # + messageId - The unique WhatsApp message ID (`wamid...`)
@@ -60,7 +60,7 @@ public type MessageErrorDetail record {|
     string details?;
 |};
 
-# One outbound message status update, part of a `MessageStatusEvent` batch.
+# One outbound message status update, part of a `MessageStatuses` batch.
 #
 # + messageId - The message ID whose status changed
 # + status - The new status (`sent`, `delivered`, `read`, `failed`)
@@ -79,14 +79,14 @@ public type MessageStatusUpdate record {|
 
 # A `messages` webhook notification that carries one or more new inbound messages. Meta always
 # sends inbound messages and status updates as two mutually exclusive payload shapes under this
-# same field — never both together in the same notification — so this and `MessageStatusEvent`
-# are the two members of the `MessagesNotificationEvent` union `onMessages` takes.
+# same field — never both together in the same notification — so this and `MessageStatuses`
+# are the two members of the `MessagesNotification` union `onMessages` takes.
 #
 # + phoneNumberId - The business phone number ID the notification relates to
 # + messages - The inbound messages
 # + timestamp - The entry-level webhook trigger timestamp (Unix epoch seconds), if present
 # + raw - The raw `value` object as received
-public type MessagesEvent record {|
+public type Messages record {|
     string phoneNumberId;
     InboundMessage[] messages;
     int timestamp?;
@@ -94,24 +94,24 @@ public type MessagesEvent record {|
 |};
 
 # A `messages` webhook notification that carries one or more outbound message status updates
-# (delivery/read receipts). See `MessagesEvent` for why this is a separate type.
+# (delivery/read receipts). See `Messages` for why this is a separate type.
 #
 # + phoneNumberId - The business phone number ID the notification relates to
 # + statuses - The status updates
 # + timestamp - The entry-level webhook trigger timestamp (Unix epoch seconds), if present
 # + raw - The raw `value` object as received
-public type MessageStatusEvent record {|
+public type MessageStatuses record {|
     string phoneNumberId;
     MessageStatusUpdate[] statuses;
     int timestamp?;
     json raw;
 |};
 
-# A `messages` webhook notification: either a batch of inbound messages (`MessagesEvent`) or a
-# batch of status updates (`MessageStatusEvent`) — Meta always sends these as two mutually
+# A `messages` webhook notification: either a batch of inbound messages (`Messages`) or a
+# batch of status updates (`MessageStatuses`) — Meta always sends these as two mutually
 # exclusive shapes under this one field, never both together. Narrow with
-# `event is MessagesEvent` / `event is MessageStatusEvent`.
-public type MessagesNotificationEvent MessagesEvent|MessageStatusEvent;
+# `notification is Messages` / `notification is MessageStatuses`.
+public type MessagesNotification Messages|MessageStatuses;
 
 # A WhatsApp Business Account (WABA) review decision.
 #
@@ -119,7 +119,7 @@ public type MessagesNotificationEvent MessagesEvent|MessageStatusEvent;
 # + decision - The review outcome (`APPROVED`, `REJECTED`, `PENDING`, or `DEFERRED`)
 # + timestamp - The entry-level webhook trigger timestamp (Unix epoch seconds), if present
 # + raw - The raw `value` object as received, for accessing undocumented fields
-public type AccountReviewUpdateEvent record {|
+public type AccountReviewUpdate record {|
     string wabaId;
     string decision;
     int timestamp?;
@@ -241,7 +241,7 @@ public type AccountUpdateRestriction record {|
 # + restrictions - Present only for `ACCOUNT_RESTRICTION` events
 # + timestamp - The entry-level webhook trigger timestamp (Unix epoch seconds), if present
 # + raw - The raw `value` object as received, for accessing undocumented sub-fields
-public type AccountUpdateEvent record {|
+public type AccountUpdate record {|
     string wabaId;
     string event;
     string country?;
@@ -268,7 +268,7 @@ public type AccountUpdateEvent record {|
 # on some payloads
 # + timestamp - The entry-level webhook trigger timestamp (Unix epoch seconds), if present
 # + raw - The raw `value` object as received
-public type BusinessCapabilityUpdateEvent record {|
+public type BusinessCapabilityUpdate record {|
     string wabaId;
     int maxDailyConversationsPerBusiness?;
     int maxPhoneNumbersPerBusiness?;
@@ -288,7 +288,7 @@ public type BusinessCapabilityUpdateEvent record {|
 # + newQualityScore - The updated quality score
 # + timestamp - The entry-level webhook trigger timestamp (Unix epoch seconds), if present
 # + raw - The raw `value` object as received
-public type MessageTemplateQualityUpdateEvent record {|
+public type MessageTemplateQualityUpdate record {|
     string wabaId;
     int messageTemplateId;
     string messageTemplateName;
@@ -338,7 +338,7 @@ public type MessageTemplateRejectionInfo record {|
 # + rejectionInfo - Present only for `INVALID_FORMAT` rejections
 # + timestamp - The entry-level webhook trigger timestamp (Unix epoch seconds), if present
 # + raw - The raw `value` object as received
-public type MessageTemplateStatusUpdateEvent record {|
+public type MessageTemplateStatusUpdate record {|
     string wabaId;
     string event;
     int messageTemplateId;
@@ -362,7 +362,7 @@ public type MessageTemplateStatusUpdateEvent record {|
 # + rejectionReason - The rejection reason (e.g. `NAME_EMPLOYEE_ISSUE`), if rejected
 # + timestamp - The entry-level webhook trigger timestamp (Unix epoch seconds), if present
 # + raw - The raw `value` object as received
-public type PhoneNumberNameUpdateEvent record {|
+public type PhoneNumberNameUpdate record {|
     string wabaId;
     string displayPhoneNumber;
     string decision;
@@ -383,7 +383,7 @@ public type PhoneNumberNameUpdateEvent record {|
 # + maxDailyConversationsPerBusiness - The current messaging capacity tier (e.g. `TIER_2K`), if present
 # + timestamp - The entry-level webhook trigger timestamp (Unix epoch seconds), if present
 # + raw - The raw `value` object as received
-public type PhoneNumberQualityUpdateEvent record {|
+public type PhoneNumberQualityUpdate record {|
     string wabaId;
     string displayPhoneNumber;
     string event;
@@ -402,7 +402,7 @@ public type PhoneNumberQualityUpdateEvent record {|
 # + requester - The Meta Business Suite user ID that initiated the action; present only for reset requests
 # + timestamp - The entry-level webhook trigger timestamp (Unix epoch seconds), if present
 # + raw - The raw `value` object as received
-public type SecurityEvent record {|
+public type Security record {|
     string wabaId;
     string displayPhoneNumber;
     string event;
@@ -418,7 +418,7 @@ public type SecurityEvent record {|
 # + 'field - The webhook field being dispatched when the handler failed (e.g. `messages`,
 #            `account_update`)
 # + payload - The raw `value` object that was being dispatched, for diagnostics
-public type HandlerErrorEvent record {|
+public type HandlerError record {|
     error 'error;
     string 'field;
     json payload;
@@ -437,7 +437,7 @@ public type HandlerErrorEvent record {|
 # imminent notice
 # + timestamp - The entry-level webhook trigger timestamp (Unix epoch seconds), if present
 # + raw - The raw `value` object as received
-public type TemplateCategoryUpdateEvent record {|
+public type TemplateCategoryUpdate record {|
     string wabaId;
     int messageTemplateId;
     string messageTemplateName;

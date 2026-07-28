@@ -24,11 +24,11 @@ import ballerina/http;
 # listener whatsapp:Listener whatsappListener = new (8090, verifyToken = "my-token", appSecret = "my-secret");
 #
 # service whatsapp:WhatsAppService on whatsappListener {
-#     remote function onMessages(whatsapp:MessagesNotificationEvent event) returns error? {
-#         if event is whatsapp:MessagesEvent {
-#             // handle inbound messages: event.messages
+#     remote function onMessages(whatsapp:MessagesNotification notification) returns error? {
+#         if notification is whatsapp:Messages {
+#             // handle inbound messages: notification.messages
 #         } else {
-#             // handle status updates: event.statuses
+#             // handle status updates: notification.statuses
 #         }
 #     }
 #     // ... plus any of the other nine (all optional) handlers you need

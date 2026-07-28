@@ -33,41 +33,41 @@
 # name must be one of the eleven below, its parameter must match the documented event type, and it
 # must return `error?`. Anything else is a compile-time error.
 #
-# - `remote function onMessages(MessagesNotificationEvent event) returns error?` — Invoked once
+# - `remote function onMessages(MessagesNotification notification) returns error?` — Invoked once
 #   per `messages` webhook notification: either a batch of inbound messages or a batch of status
 #   updates. Meta always sends these as two mutually exclusive shapes under this one field, never
-#   both together; narrow with `event is MessagesEvent` / `event is MessageStatusEvent`.
-# - `remote function onAccountReviewUpdate(AccountReviewUpdateEvent event) returns error?` —
+#   both together; narrow with `notification is Messages` / `notification is MessageStatuses`.
+# - `remote function onAccountReviewUpdate(AccountReviewUpdate update) returns error?` —
 #   Invoked when a WhatsApp Business Account's review decision changes.
-# - `remote function onAccountUpdate(AccountUpdateEvent event) returns error?` — Invoked on
+# - `remote function onAccountUpdate(AccountUpdate update) returns error?` — Invoked on
 #   account-lifecycle and compliance changes (verification, violations, partner changes,
 #   pricing-tier updates, restrictions, disconnection).
-# - `remote function onBusinessCapabilityUpdate(BusinessCapabilityUpdateEvent event) returns error?`
+# - `remote function onBusinessCapabilityUpdate(BusinessCapabilityUpdate update) returns error?`
 #   — Invoked when a WABA's messaging or phone-number capability limits change.
-# - `remote function onMessageTemplateQualityUpdate(MessageTemplateQualityUpdateEvent event) returns error?`
+# - `remote function onMessageTemplateQualityUpdate(MessageTemplateQualityUpdate update) returns error?`
 #   — Invoked when a message template's quality score changes.
-# - `remote function onMessageTemplateStatusUpdate(MessageTemplateStatusUpdateEvent event) returns error?`
+# - `remote function onMessageTemplateStatusUpdate(MessageTemplateStatusUpdate update) returns error?`
 #   — Invoked when a message template's status changes (approved, rejected, disabled, ...).
-# - `remote function onPhoneNumberNameUpdate(PhoneNumberNameUpdateEvent event) returns error?` —
+# - `remote function onPhoneNumberNameUpdate(PhoneNumberNameUpdate update) returns error?` —
 #   Invoked when a business phone number's display-name review outcome is available.
-# - `remote function onPhoneNumberQualityUpdate(PhoneNumberQualityUpdateEvent event) returns error?`
+# - `remote function onPhoneNumberQualityUpdate(PhoneNumberQualityUpdate update) returns error?`
 #   — Invoked when a business phone number's messaging throughput/quality tier changes.
-# - `remote function onSecurity(SecurityEvent event) returns error?` — Invoked on
+# - `remote function onSecurity(Security security) returns error?` — Invoked on
 #   two-step-verification PIN changes and reset requests for a business phone number.
-# - `remote function onTemplateCategoryUpdate(TemplateCategoryUpdateEvent event) returns error?` —
+# - `remote function onTemplateCategoryUpdate(TemplateCategoryUpdate update) returns error?` —
 #   Invoked when a message template's category changes, or is about to change.
-# - `remote function onError(HandlerErrorEvent event) returns error?` — Invoked when any of the
+# - `remote function onError(HandlerError handlerError) returns error?` — Invoked when any of the
 #   handlers above returns an error while being dispatched for an incoming notification.
 public type WhatsAppService distinct service object {
-    // remote function onMessages(MessagesNotificationEvent event) returns error?;
-    // remote function onAccountReviewUpdate(AccountReviewUpdateEvent event) returns error?;
-    // remote function onAccountUpdate(AccountUpdateEvent event) returns error?;
-    // remote function onBusinessCapabilityUpdate(BusinessCapabilityUpdateEvent event) returns error?;
-    // remote function onMessageTemplateQualityUpdate(MessageTemplateQualityUpdateEvent event) returns error?;
-    // remote function onMessageTemplateStatusUpdate(MessageTemplateStatusUpdateEvent event) returns error?;
-    // remote function onPhoneNumberNameUpdate(PhoneNumberNameUpdateEvent event) returns error?;
-    // remote function onPhoneNumberQualityUpdate(PhoneNumberQualityUpdateEvent event) returns error?;
-    // remote function onSecurity(SecurityEvent event) returns error?;
-    // remote function onTemplateCategoryUpdate(TemplateCategoryUpdateEvent event) returns error?;
-    // remote function onError(HandlerErrorEvent event) returns error?;
+    // remote function onMessages(MessagesNotification notification) returns error?;
+    // remote function onAccountReviewUpdate(AccountReviewUpdate update) returns error?;
+    // remote function onAccountUpdate(AccountUpdate update) returns error?;
+    // remote function onBusinessCapabilityUpdate(BusinessCapabilityUpdate update) returns error?;
+    // remote function onMessageTemplateQualityUpdate(MessageTemplateQualityUpdate update) returns error?;
+    // remote function onMessageTemplateStatusUpdate(MessageTemplateStatusUpdate update) returns error?;
+    // remote function onPhoneNumberNameUpdate(PhoneNumberNameUpdate update) returns error?;
+    // remote function onPhoneNumberQualityUpdate(PhoneNumberQualityUpdate update) returns error?;
+    // remote function onSecurity(Security security) returns error?;
+    // remote function onTemplateCategoryUpdate(TemplateCategoryUpdate update) returns error?;
+    // remote function onError(HandlerError handlerError) returns error?;
 };

@@ -16,7 +16,25 @@
 
 import ballerina/crypto;
 import ballerina/http;
+import ballerina/lang.runtime;
 import ballerina/test;
+import ballerina/time;
+
+// The webhook handler acks before dispatching (see `dispatch_service.bal`), so a handler's
+// side effect is not guaranteed to be visible the instant the HTTP response returns. Polls
+// `predicate` until it holds or `timeoutSeconds` (wall-clock, not just cumulative sleep time)
+// elapses, to avoid asserting on that race.
+isolated function waitUntil(isolated function () returns boolean predicate, decimal timeoutSeconds = 5)
+        returns error? {
+    decimal interval = 0.05;
+    decimal deadline = time:monotonicNow() + timeoutSeconds;
+    while !predicate() {
+        if time:monotonicNow() >= deadline {
+            return error(string `Condition not met within ${timeoutSeconds}s`);
+        }
+        runtime:sleep(interval);
+    }
+}
 
 // A service declaring none of the ten (all-optional) handlers, so a `Listener` can be attached
 // and started in handshake tests without caring about any particular event.
@@ -30,7 +48,7 @@ isolated int messagesReceived = 0;
 // declared handler and silently skips every handler this service does not declare.
 isolated service class MessagesOnlyWhatsAppService {
     *WhatsAppService;
-    remote function onMessages(MessagesNotificationEvent event) returns error? {
+    remote function onMessages(MessagesNotification notification) returns error? {
         lock {
             messagesReceived += 1;
         }
@@ -44,15 +62,15 @@ isolated string onErrorLastField = "";
 // the failing handler's field/payload when the failing handler returns an error.
 isolated service class FailingHandlerWhatsAppService {
     *WhatsAppService;
-    remote function onSecurity(SecurityEvent event) returns error? {
+    remote function onSecurity(Security security) returns error? {
         return error("boom");
     }
-    remote function onError(HandlerErrorEvent event) returns error? {
+    remote function onError(HandlerError handlerError) returns error? {
         lock {
             onErrorInvocations += 1;
         }
         lock {
-            onErrorLastField = event.'field;
+            onErrorLastField = handlerError.'field;
         }
     }
 }
@@ -175,6 +193,11 @@ function testDispatchInvokesOnlyDeclaredHandler() returns error? {
     http:Ok _ = check callerClient->post("/", securityPayload,
             headers = {[WEBHOOK_SIGNATURE_HEADER]: "sha256=" + securityHmac.toBase16().toLowerAscii()});
 
+    check waitUntil(isolated function() returns boolean {
+        lock {
+            return messagesReceived >= 1;
+        }
+    });
     lock {
         test:assertEquals(messagesReceived, 1, "onMessages should have been invoked exactly once");
     }
@@ -213,6 +236,11 @@ function testOnErrorInvokedWhenHandlerFails() returns error? {
     http:Ok _ = check callerClient->post("/", securityPayload,
             headers = {[WEBHOOK_SIGNATURE_HEADER]: "sha256=" + securityHmac.toBase16().toLowerAscii()});
 
+    check waitUntil(isolated function() returns boolean {
+        lock {
+            return onErrorInvocations >= 1;
+        }
+    });
     lock {
         test:assertEquals(onErrorInvocations, 1, "onError should have been invoked exactly once");
     }

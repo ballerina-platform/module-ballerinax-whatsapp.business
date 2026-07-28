@@ -60,56 +60,56 @@ public function main() returns error? {
 listener whatsapp:Listener whatsappListener = new (8090, verifyToken = verifyToken, appSecret = appSecret);
 
 service whatsapp:WhatsAppService on whatsappListener {
-    remote function onMessages(whatsapp:MessagesNotificationEvent event) returns error? {
-        if event is whatsapp:MessagesEvent {
-            foreach whatsapp:InboundMessage message in event.messages {
+    remote function onMessages(whatsapp:MessagesNotification notification) returns error? {
+        if notification is whatsapp:Messages {
+            foreach whatsapp:InboundMessage message in notification.messages {
                 log:printInfo(string `Message from ${mask(message.'from)}: ${message.text ?: "(non-text message)"}`);
             }
         } else {
-            foreach whatsapp:MessageStatusUpdate status in event.statuses {
+            foreach whatsapp:MessageStatusUpdate status in notification.statuses {
                 log:printInfo(string `Message ${status.messageId} is now ${status.status}`);
             }
         }
     }
 
-    remote function onAccountReviewUpdate(whatsapp:AccountReviewUpdateEvent event) returns error? {
-        log:printInfo(string `WABA ${mask(event.wabaId)} review decision: ${event.decision}`);
+    remote function onAccountReviewUpdate(whatsapp:AccountReviewUpdate update) returns error? {
+        log:printInfo(string `WABA ${mask(update.wabaId)} review decision: ${update.decision}`);
     }
 
-    remote function onAccountUpdate(whatsapp:AccountUpdateEvent event) returns error? {
-        log:printInfo(string `WABA ${mask(event.wabaId)} account update: ${event.event}`);
+    remote function onAccountUpdate(whatsapp:AccountUpdate update) returns error? {
+        log:printInfo(string `WABA ${mask(update.wabaId)} account update: ${update.event}`);
     }
 
-    remote function onBusinessCapabilityUpdate(whatsapp:BusinessCapabilityUpdateEvent event)
+    remote function onBusinessCapabilityUpdate(whatsapp:BusinessCapabilityUpdate update)
     returns error? {
-        log:printInfo(string `WABA ${mask(event.wabaId)} capability update`);
+        log:printInfo(string `WABA ${mask(update.wabaId)} capability update`);
     }
 
-    remote function onMessageTemplateQualityUpdate(whatsapp:MessageTemplateQualityUpdateEvent event)
+    remote function onMessageTemplateQualityUpdate(whatsapp:MessageTemplateQualityUpdate update)
     returns error? {
-        log:printInfo(string `Template ${event.messageTemplateName} quality: ` +
-                string `${event.previousQualityScore} -> ${event.newQualityScore}`);
+        log:printInfo(string `Template ${update.messageTemplateName} quality: ` +
+                string `${update.previousQualityScore} -> ${update.newQualityScore}`);
     }
 
-    remote function onMessageTemplateStatusUpdate(whatsapp:MessageTemplateStatusUpdateEvent event)
+    remote function onMessageTemplateStatusUpdate(whatsapp:MessageTemplateStatusUpdate update)
     returns error? {
-        log:printInfo(string `Template ${event.messageTemplateName} status: ${event.event}`);
+        log:printInfo(string `Template ${update.messageTemplateName} status: ${update.event}`);
     }
 
-    remote function onPhoneNumberNameUpdate(whatsapp:PhoneNumberNameUpdateEvent event) returns error? {
-        log:printInfo(string `Phone number ${mask(event.displayPhoneNumber)} name decision: ${event.decision}`);
+    remote function onPhoneNumberNameUpdate(whatsapp:PhoneNumberNameUpdate update) returns error? {
+        log:printInfo(string `Phone number ${mask(update.displayPhoneNumber)} name decision: ${update.decision}`);
     }
 
-    remote function onPhoneNumberQualityUpdate(whatsapp:PhoneNumberQualityUpdateEvent event)
+    remote function onPhoneNumberQualityUpdate(whatsapp:PhoneNumberQualityUpdate update)
     returns error? {
-        log:printInfo(string `Phone number ${mask(event.displayPhoneNumber)} quality update: ${event.event}`);
+        log:printInfo(string `Phone number ${mask(update.displayPhoneNumber)} quality update: ${update.event}`);
     }
 
-    remote function onSecurity(whatsapp:SecurityEvent event) returns error? {
-        log:printInfo(string `Security event on ${mask(event.displayPhoneNumber)}: ${event.event}`);
+    remote function onSecurity(whatsapp:Security security) returns error? {
+        log:printInfo(string `Security event on ${mask(security.displayPhoneNumber)}: ${security.event}`);
     }
 
-    remote function onTemplateCategoryUpdate(whatsapp:TemplateCategoryUpdateEvent event) returns error? {
-        log:printInfo(string `Template ${event.messageTemplateName} category update: ${event.newCategory}`);
+    remote function onTemplateCategoryUpdate(whatsapp:TemplateCategoryUpdate update) returns error? {
+        log:printInfo(string `Template ${update.messageTemplateName} category update: ${update.newCategory}`);
     }
 }

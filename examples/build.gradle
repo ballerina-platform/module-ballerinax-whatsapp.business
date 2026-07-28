@@ -1,0 +1,57 @@
+/*
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+task test {
+    doLast {
+        try {
+            exec {
+                workingDir project.projectDir
+                println("Working dir: ${workingDir}")
+                // 'bash' (not 'cmd') on every OS: the script is a Bash script, and Windows CI
+                // runners provide Git Bash on PATH, but cmd.exe understands neither chmod nor ./.
+                commandLine 'bash', "-c", "chmod +x ./build.sh && ./build.sh run"
+            }
+        } catch (Exception e) {
+            println("Example Run failed: " + e.message)
+            throw e
+        }
+    }
+}
+
+task build {
+    gradle.taskGraph.whenReady { graph ->
+        if (graph.hasTask(":whatsapp.business-examples:test")) {
+            build.enabled = false
+        }
+    }
+    doLast {
+        try {
+            exec {
+                workingDir project.projectDir
+                println("Working dir: ${workingDir}")
+                commandLine 'bash', "-c", "chmod +x ./build.sh && ./build.sh build"
+            }
+        } catch (Exception e) {
+            println("Example Build failed: " + e.message)
+            throw e
+        }
+    }
+}
+
+test.dependsOn ":whatsapp.business-ballerina:build"
+build.dependsOn ":whatsapp.business-ballerina:build"

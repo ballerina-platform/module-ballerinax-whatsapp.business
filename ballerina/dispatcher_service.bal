@@ -18,16 +18,16 @@ import ballerina/http;
 import ballerina/jballerina.java;
 import ballerina/log;
 
-# Invokes the named handler on `whatsappService` with `event`, if (and only if) the service
+# Invokes the named handler on `whatsappService` with `argument`, if (and only if) the service
 # declares that handler; since `WhatsAppService` declares no remote methods (all ten handlers are
 # optional), there is no statically bound method to call directly, so this dispatches
 # reflectively via the native (Java) runtime.
 #
 # + whatsappService - The attached `WhatsAppService` implementation
 # + methodName - The handler's name, e.g. `onMessages`
-# + event - The event record to pass as the handler's sole argument
+# + argument - The record to pass as the handler's sole argument
 # + return - The handler's result, or `()` if it does not declare that handler
-isolated function invokeHandlerIfPresent(WhatsAppService whatsappService, string methodName, any event)
+isolated function invokeHandlerIfPresent(WhatsAppService whatsappService, string methodName, any argument)
         returns error? = @java:Method {
     name: "invokeIfPresent",
     'class: "io.ballerinax.whatsapp.business.HandlerDispatcher"
@@ -42,8 +42,8 @@ isolated function invokeHandlerIfPresent(WhatsAppService whatsappService, string
 # + 'field - The webhook field being dispatched when the handler failed
 # + payload - The raw `value` object that was being dispatched
 isolated function invokeOnError(WhatsAppService whatsappService, error handlerError, string 'field, json payload) {
-    HandlerErrorEvent event = {'error: handlerError, 'field, payload};
-    error? result = invokeHandlerIfPresent(whatsappService, "onError", event);
+    HandlerError errorInfo = {'error: handlerError, 'field, payload};
+    error? result = invokeHandlerIfPresent(whatsappService, "onError", errorInfo);
     if result is error {
         log:printError(ERR_ON_ERROR_HANDLER, result, 'field = 'field);
     }
@@ -110,32 +110,32 @@ returns AccountUpdateRateEligibility {
     };
 }
 
-isolated function toMessagesEvent(string phoneNumberId, InboundMessage[] messages, int? entryTimestamp,
-        json valueJson) returns MessagesEvent => {
+isolated function toMessages(string phoneNumberId, InboundMessage[] messages, int? entryTimestamp,
+        json valueJson) returns Messages => {
     phoneNumberId,
     messages,
     timestamp: entryTimestamp,
     raw: valueJson
 };
 
-isolated function toMessageStatusEvent(string phoneNumberId, MessageStatusUpdate[] statuses, int? entryTimestamp,
-        json valueJson) returns MessageStatusEvent => {
+isolated function toMessageStatuses(string phoneNumberId, MessageStatusUpdate[] statuses, int? entryTimestamp,
+        json valueJson) returns MessageStatuses => {
     phoneNumberId,
     statuses,
     timestamp: entryTimestamp,
     raw: valueJson
 };
 
-isolated function toAccountReviewUpdateEvent(string wabaId, WebhookAccountReviewValue v, int? entryTimestamp,
-        json valueJson) returns AccountReviewUpdateEvent => {
+isolated function toAccountReviewUpdate(string wabaId, WebhookAccountReviewValue v, int? entryTimestamp,
+        json valueJson) returns AccountReviewUpdate => {
     wabaId,
     decision: v.decision ?: "",
     timestamp: entryTimestamp,
     raw: valueJson
 };
 
-isolated function toAccountUpdateEvent(string wabaId, WebhookAccountUpdateValue v, int? entryTimestamp,
-        json valueJson) returns AccountUpdateEvent {
+isolated function toAccountUpdate(string wabaId, WebhookAccountUpdateValue v, int? entryTimestamp,
+        json valueJson) returns AccountUpdate {
     WebhookWabaInfo? wi = v.waba_info;
     WebhookViolationInfo? vi = v.violation_info;
     WebhookBanInfo? bi = v.ban_info;
@@ -185,8 +185,8 @@ isolated function toAccountUpdateEvent(string wabaId, WebhookAccountUpdateValue 
     };
 }
 
-isolated function toBusinessCapabilityUpdateEvent(string wabaId, WebhookBusinessCapabilityValue v,
-        int? entryTimestamp, json valueJson) returns BusinessCapabilityUpdateEvent => {
+isolated function toBusinessCapabilityUpdate(string wabaId, WebhookBusinessCapabilityValue v,
+        int? entryTimestamp, json valueJson) returns BusinessCapabilityUpdate => {
     wabaId,
     maxDailyConversationsPerBusiness: v.max_daily_conversations_per_business,
     maxPhoneNumbersPerBusiness: v.max_phone_numbers_per_business,
@@ -196,8 +196,8 @@ isolated function toBusinessCapabilityUpdateEvent(string wabaId, WebhookBusiness
     raw: valueJson
 };
 
-isolated function toMessageTemplateQualityUpdateEvent(string wabaId, WebhookTemplateQualityValue v,
-        int? entryTimestamp, json valueJson) returns MessageTemplateQualityUpdateEvent => {
+isolated function toMessageTemplateQualityUpdate(string wabaId, WebhookTemplateQualityValue v,
+        int? entryTimestamp, json valueJson) returns MessageTemplateQualityUpdate => {
     wabaId,
     messageTemplateId: v.message_template_id ?: 0,
     messageTemplateName: v.message_template_name ?: "",
@@ -208,8 +208,8 @@ isolated function toMessageTemplateQualityUpdateEvent(string wabaId, WebhookTemp
     raw: valueJson
 };
 
-isolated function toMessageTemplateStatusUpdateEvent(string wabaId, WebhookTemplateStatusValue v,
-        int? entryTimestamp, json valueJson) returns MessageTemplateStatusUpdateEvent {
+isolated function toMessageTemplateStatusUpdate(string wabaId, WebhookTemplateStatusValue v,
+        int? entryTimestamp, json valueJson) returns MessageTemplateStatusUpdate {
     WebhookTemplateDisableInfo? disableInfo = v.disable_info;
     WebhookTemplateOtherInfo? otherInfo = v.other_info;
     WebhookTemplateRejectionInfo? rejectionInfo = v.rejection_info;
@@ -233,8 +233,8 @@ isolated function toMessageTemplateStatusUpdateEvent(string wabaId, WebhookTempl
     };
 }
 
-isolated function toPhoneNumberNameUpdateEvent(string wabaId, WebhookPhoneNumberNameValue v, int? entryTimestamp,
-        json valueJson) returns PhoneNumberNameUpdateEvent => {
+isolated function toPhoneNumberNameUpdate(string wabaId, WebhookPhoneNumberNameValue v, int? entryTimestamp,
+        json valueJson) returns PhoneNumberNameUpdate => {
     wabaId,
     displayPhoneNumber: v.display_phone_number ?: "",
     decision: v.decision ?: "",
@@ -244,8 +244,8 @@ isolated function toPhoneNumberNameUpdateEvent(string wabaId, WebhookPhoneNumber
     raw: valueJson
 };
 
-isolated function toPhoneNumberQualityUpdateEvent(string wabaId, WebhookPhoneNumberQualityValue v,
-        int? entryTimestamp, json valueJson) returns PhoneNumberQualityUpdateEvent => {
+isolated function toPhoneNumberQualityUpdate(string wabaId, WebhookPhoneNumberQualityValue v,
+        int? entryTimestamp, json valueJson) returns PhoneNumberQualityUpdate => {
     wabaId,
     displayPhoneNumber: v.display_phone_number ?: "",
     event: v.event ?: "",
@@ -256,8 +256,8 @@ isolated function toPhoneNumberQualityUpdateEvent(string wabaId, WebhookPhoneNum
     raw: valueJson
 };
 
-isolated function toSecurityEvent(string wabaId, WebhookSecurityValue v, int? entryTimestamp, json valueJson)
-        returns SecurityEvent => {
+isolated function toSecurity(string wabaId, WebhookSecurityValue v, int? entryTimestamp, json valueJson)
+        returns Security => {
     wabaId,
     displayPhoneNumber: v.display_phone_number ?: "",
     event: v.event ?: "",
@@ -266,8 +266,8 @@ isolated function toSecurityEvent(string wabaId, WebhookSecurityValue v, int? en
     raw: valueJson
 };
 
-isolated function toTemplateCategoryUpdateEvent(string wabaId, WebhookTemplateCategoryValue v, int? entryTimestamp,
-        json valueJson) returns TemplateCategoryUpdateEvent => {
+isolated function toTemplateCategoryUpdate(string wabaId, WebhookTemplateCategoryValue v, int? entryTimestamp,
+        json valueJson) returns TemplateCategoryUpdate => {
     wabaId,
     messageTemplateId: v.message_template_id ?: 0,
     messageTemplateName: v.message_template_name ?: "",
@@ -390,9 +390,10 @@ service class HttpService {
                             }
                         }
                         if typedMessages.length() > 0 {
-                            MessagesEvent event = toMessagesEvent(phoneNumberId, typedMessages, entryTimestamp,
+                            Messages messagesNotification = toMessages(phoneNumberId, typedMessages, entryTimestamp,
                                     valueJson);
-                            error? result = invokeHandlerIfPresent(self.whatsappService, "onMessages", event);
+                            error? result = invokeHandlerIfPresent(self.whatsappService, "onMessages",
+                                    messagesNotification);
                             if result is error {
                                 log:printError(ERR_ON_MESSAGES_HANDLER, result, phoneNumberId = phoneNumberId);
                                 invokeOnError(self.whatsappService, result, 'field, valueJson);
@@ -410,9 +411,10 @@ service class HttpService {
                             }
                         }
                         if typedStatuses.length() > 0 {
-                            MessageStatusEvent event = toMessageStatusEvent(phoneNumberId, typedStatuses,
+                            MessageStatuses statusesNotification = toMessageStatuses(phoneNumberId, typedStatuses,
                                     entryTimestamp, valueJson);
-                            error? result = invokeHandlerIfPresent(self.whatsappService, "onMessages", event);
+                            error? result = invokeHandlerIfPresent(self.whatsappService, "onMessages",
+                                    statusesNotification);
                             if result is error {
                                 log:printError(ERR_ON_MESSAGES_HANDLER, result, phoneNumberId = phoneNumberId);
                                 invokeOnError(self.whatsappService, result, 'field, valueJson);
@@ -430,10 +432,10 @@ service class HttpService {
                             if v is error {
                                 log:printError(ERR_WEBHOOK_VALUE_PARSE_FAILED, v, wabaId = wabaId, 'field = 'field);
                             } else {
-                                AccountReviewUpdateEvent event = toAccountReviewUpdateEvent(wabaId, v,
+                                AccountReviewUpdate update = toAccountReviewUpdate(wabaId, v,
                                         entryTimestamp, valueJson);
                                 error? result = invokeHandlerIfPresent(self.whatsappService,
-                                        "onAccountReviewUpdate", event);
+                                        "onAccountReviewUpdate", update);
                                 if result is error {
                                     log:printError(ERR_ON_ACCOUNT_REVIEW_UPDATE_HANDLER, result, wabaId = wabaId);
                                     invokeOnError(self.whatsappService, result, 'field, valueJson);
@@ -445,10 +447,10 @@ service class HttpService {
                             if v is error {
                                 log:printError(ERR_WEBHOOK_VALUE_PARSE_FAILED, v, wabaId = wabaId, 'field = 'field);
                             } else {
-                                AccountUpdateEvent event = toAccountUpdateEvent(wabaId, v, entryTimestamp,
+                                AccountUpdate update = toAccountUpdate(wabaId, v, entryTimestamp,
                                         valueJson);
                                 error? result = invokeHandlerIfPresent(self.whatsappService,
-                                        "onAccountUpdate", event);
+                                        "onAccountUpdate", update);
                                 if result is error {
                                     log:printError(ERR_ON_ACCOUNT_UPDATE_HANDLER, result, wabaId = wabaId);
                                     invokeOnError(self.whatsappService, result, 'field, valueJson);
@@ -460,10 +462,10 @@ service class HttpService {
                             if v is error {
                                 log:printError(ERR_WEBHOOK_VALUE_PARSE_FAILED, v, wabaId = wabaId, 'field = 'field);
                             } else {
-                                BusinessCapabilityUpdateEvent event = toBusinessCapabilityUpdateEvent(wabaId, v,
+                                BusinessCapabilityUpdate update = toBusinessCapabilityUpdate(wabaId, v,
                                         entryTimestamp, valueJson);
                                 error? result = invokeHandlerIfPresent(self.whatsappService,
-                                        "onBusinessCapabilityUpdate", event);
+                                        "onBusinessCapabilityUpdate", update);
                                 if result is error {
                                     log:printError(ERR_ON_BUSINESS_CAPABILITY_UPDATE_HANDLER, result,
                                             wabaId = wabaId);
@@ -476,10 +478,10 @@ service class HttpService {
                             if v is error {
                                 log:printError(ERR_WEBHOOK_VALUE_PARSE_FAILED, v, wabaId = wabaId, 'field = 'field);
                             } else {
-                                MessageTemplateQualityUpdateEvent event = toMessageTemplateQualityUpdateEvent(
+                                MessageTemplateQualityUpdate update = toMessageTemplateQualityUpdate(
                                         wabaId, v, entryTimestamp, valueJson);
                                 error? result = invokeHandlerIfPresent(self.whatsappService,
-                                        "onMessageTemplateQualityUpdate", event);
+                                        "onMessageTemplateQualityUpdate", update);
                                 if result is error {
                                     log:printError(ERR_ON_MESSAGE_TEMPLATE_QUALITY_UPDATE_HANDLER, result,
                                             wabaId = wabaId);
@@ -492,10 +494,10 @@ service class HttpService {
                             if v is error {
                                 log:printError(ERR_WEBHOOK_VALUE_PARSE_FAILED, v, wabaId = wabaId, 'field = 'field);
                             } else {
-                                MessageTemplateStatusUpdateEvent event = toMessageTemplateStatusUpdateEvent(
+                                MessageTemplateStatusUpdate update = toMessageTemplateStatusUpdate(
                                         wabaId, v, entryTimestamp, valueJson);
                                 error? result = invokeHandlerIfPresent(self.whatsappService,
-                                        "onMessageTemplateStatusUpdate", event);
+                                        "onMessageTemplateStatusUpdate", update);
                                 if result is error {
                                     log:printError(ERR_ON_MESSAGE_TEMPLATE_STATUS_UPDATE_HANDLER, result,
                                             wabaId = wabaId);
@@ -508,10 +510,10 @@ service class HttpService {
                             if v is error {
                                 log:printError(ERR_WEBHOOK_VALUE_PARSE_FAILED, v, wabaId = wabaId, 'field = 'field);
                             } else {
-                                PhoneNumberNameUpdateEvent event = toPhoneNumberNameUpdateEvent(wabaId, v,
+                                PhoneNumberNameUpdate update = toPhoneNumberNameUpdate(wabaId, v,
                                         entryTimestamp, valueJson);
                                 error? result = invokeHandlerIfPresent(self.whatsappService,
-                                        "onPhoneNumberNameUpdate", event);
+                                        "onPhoneNumberNameUpdate", update);
                                 if result is error {
                                     log:printError(ERR_ON_PHONE_NUMBER_NAME_UPDATE_HANDLER, result, wabaId = wabaId);
                                     invokeOnError(self.whatsappService, result, 'field, valueJson);
@@ -523,10 +525,10 @@ service class HttpService {
                             if v is error {
                                 log:printError(ERR_WEBHOOK_VALUE_PARSE_FAILED, v, wabaId = wabaId, 'field = 'field);
                             } else {
-                                PhoneNumberQualityUpdateEvent event = toPhoneNumberQualityUpdateEvent(wabaId, v,
+                                PhoneNumberQualityUpdate update = toPhoneNumberQualityUpdate(wabaId, v,
                                         entryTimestamp, valueJson);
                                 error? result = invokeHandlerIfPresent(self.whatsappService,
-                                        "onPhoneNumberQualityUpdate", event);
+                                        "onPhoneNumberQualityUpdate", update);
                                 if result is error {
                                     log:printError(ERR_ON_PHONE_NUMBER_QUALITY_UPDATE_HANDLER, result,
                                             wabaId = wabaId);
@@ -539,8 +541,8 @@ service class HttpService {
                             if v is error {
                                 log:printError(ERR_WEBHOOK_VALUE_PARSE_FAILED, v, wabaId = wabaId, 'field = 'field);
                             } else {
-                                SecurityEvent event = toSecurityEvent(wabaId, v, entryTimestamp, valueJson);
-                                error? result = invokeHandlerIfPresent(self.whatsappService, "onSecurity", event);
+                                Security security = toSecurity(wabaId, v, entryTimestamp, valueJson);
+                                error? result = invokeHandlerIfPresent(self.whatsappService, "onSecurity", security);
                                 if result is error {
                                     log:printError(ERR_ON_SECURITY_HANDLER, result, wabaId = wabaId);
                                     invokeOnError(self.whatsappService, result, 'field, valueJson);
@@ -552,10 +554,10 @@ service class HttpService {
                             if v is error {
                                 log:printError(ERR_WEBHOOK_VALUE_PARSE_FAILED, v, wabaId = wabaId, 'field = 'field);
                             } else {
-                                TemplateCategoryUpdateEvent event = toTemplateCategoryUpdateEvent(wabaId, v,
+                                TemplateCategoryUpdate update = toTemplateCategoryUpdate(wabaId, v,
                                         entryTimestamp, valueJson);
                                 error? result = invokeHandlerIfPresent(self.whatsappService,
-                                        "onTemplateCategoryUpdate", event);
+                                        "onTemplateCategoryUpdate", update);
                                 if result is error {
                                     log:printError(ERR_ON_TEMPLATE_CATEGORY_UPDATE_HANDLER, result,
                                             wabaId = wabaId);

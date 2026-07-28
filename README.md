@@ -36,7 +36,7 @@ From **WhatsApp → Configuration → Webhooks**:
 
 1. Set the **Callback URL** to your listener's public URL (e.g. via a tunnel during development).
 2. Set a **Verify token** — this must match the `verifyToken` you pass to `whatsapp:Listener`.
-3. Subscribe to the fields you want notifications for. Each maps 1:1 to one `WhatsAppService` handler: `messages` (`onMessages` — inbound messages and status updates both arrive here, as two mutually exclusive payload shapes; narrow the `MessagesNotificationEvent` parameter with `event is MessagesEvent`), `account_review_update` (`onAccountReviewUpdate`), `account_update` (`onAccountUpdate`), `business_capability_update` (`onBusinessCapabilityUpdate`), `message_template_quality_update` (`onMessageTemplateQualityUpdate`), `message_template_status_update` (`onMessageTemplateStatusUpdate`), `phone_number_name_update` (`onPhoneNumberNameUpdate`), `phone_number_quality_update` (`onPhoneNumberQualityUpdate`), `security` (`onSecurity`), `template_category_update` (`onTemplateCategoryUpdate`). A field outside this set is logged and dropped.
+3. Subscribe to the fields you want notifications for. Each maps 1:1 to one `WhatsAppService` handler: `messages` (`onMessages` — inbound messages and status updates both arrive here, as two mutually exclusive payload shapes; narrow the `MessagesNotification` parameter with `notification is Messages`), `account_review_update` (`onAccountReviewUpdate`), `account_update` (`onAccountUpdate`), `business_capability_update` (`onBusinessCapabilityUpdate`), `message_template_quality_update` (`onMessageTemplateQualityUpdate`), `message_template_status_update` (`onMessageTemplateStatusUpdate`), `phone_number_name_update` (`onPhoneNumberNameUpdate`), `phone_number_quality_update` (`onPhoneNumberQualityUpdate`), `security` (`onSecurity`), `template_category_update` (`onTemplateCategoryUpdate`). A field outside this set is logged and dropped.
 4. Copy the app's **App secret** (App Settings → Basic) and pass it as the listener's `appSecret` so inbound notifications are authenticated via `X-Hub-Signature-256`.
 
 Both `verifyToken` and `appSecret` are required fields on `whatsapp:Listener` — there is no way to start it without them.
@@ -121,14 +121,14 @@ listener whatsapp:Listener whatsappListener = new (
 
 ```ballerina
 service whatsapp:WhatsAppService on whatsappListener {
-    remote function onMessages(whatsapp:MessagesNotificationEvent event) returns error? {
-        if event is whatsapp:MessagesEvent {
-            // handle inbound messages: event.messages
+    remote function onMessages(whatsapp:MessagesNotification notification) returns error? {
+        if notification is whatsapp:Messages {
+            // handle inbound messages: notification.messages
         } else {
-            // handle status updates: event.statuses
+            // handle status updates: notification.statuses
         }
     }
-    remote function onSecurity(whatsapp:SecurityEvent event) returns error? {
+    remote function onSecurity(whatsapp:Security security) returns error? {
         // handle a PIN change/reset event
     }
 }
