@@ -31,17 +31,17 @@ final class PluginConstants {
 
     // Handler name -> the simple name of its expected (sole) parameter type.
     static final Map<String, String> HANDLER_PARAM_TYPES = Map.ofEntries(
-            Map.entry("onMessages", "MessagesNotificationEvent"),
-            Map.entry("onAccountReviewUpdate", "AccountReviewUpdateEvent"),
-            Map.entry("onAccountUpdate", "AccountUpdateEvent"),
-            Map.entry("onBusinessCapabilityUpdate", "BusinessCapabilityUpdateEvent"),
-            Map.entry("onMessageTemplateQualityUpdate", "MessageTemplateQualityUpdateEvent"),
-            Map.entry("onMessageTemplateStatusUpdate", "MessageTemplateStatusUpdateEvent"),
-            Map.entry("onPhoneNumberNameUpdate", "PhoneNumberNameUpdateEvent"),
-            Map.entry("onPhoneNumberQualityUpdate", "PhoneNumberQualityUpdateEvent"),
-            Map.entry("onSecurity", "SecurityEvent"),
-            Map.entry("onTemplateCategoryUpdate", "TemplateCategoryUpdateEvent"),
-            Map.entry("onError", "HandlerErrorEvent")
+            Map.entry("onMessages", "MessagesNotification"),
+            Map.entry("onAccountReviewUpdate", "AccountReviewUpdate"),
+            Map.entry("onAccountUpdate", "AccountUpdate"),
+            Map.entry("onBusinessCapabilityUpdate", "BusinessCapabilityUpdate"),
+            Map.entry("onMessageTemplateQualityUpdate", "MessageTemplateQualityUpdate"),
+            Map.entry("onMessageTemplateStatusUpdate", "MessageTemplateStatusUpdate"),
+            Map.entry("onPhoneNumberNameUpdate", "PhoneNumberNameUpdate"),
+            Map.entry("onPhoneNumberQualityUpdate", "PhoneNumberQualityUpdate"),
+            Map.entry("onSecurity", "Security"),
+            Map.entry("onTemplateCategoryUpdate", "TemplateCategoryUpdate"),
+            Map.entry("onError", "HandlerError")
     );
 
     /**
