@@ -6,7 +6,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  # No workflows can run parallel as these are run against the same system
+  group: ${{ github.repository }}
   cancel-in-progress: true
 
 jobs:
@@ -16,5 +17,4 @@ jobs:
     uses: ballerina-platform/ballerina-library/.github/workflows/build-with-bal-test-graalvm-connector-template.yml@main
     secrets: inherit
     with:
-      additional-build-flags: "-x :whatsapp.business-examples:build"
       additional-test-flags: "--groups=mock"

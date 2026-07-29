@@ -16,7 +16,7 @@
  * under the License.
  */
 
-task test {
+task testExamples {
     doLast {
         try {
             exec {
@@ -33,10 +33,10 @@ task test {
     }
 }
 
-task build {
+task buildExamples {
     gradle.taskGraph.whenReady { graph ->
-        if (graph.hasTask(":whatsapp.business-examples:test")) {
-            build.enabled = false
+        if (graph.hasTask(":whatsapp.business-examples:testExamples")) {
+            buildExamples.enabled = false
         }
     }
     doLast {
@@ -53,5 +53,5 @@ task build {
     }
 }
 
-test.dependsOn ":whatsapp.business-ballerina:build"
-build.dependsOn ":whatsapp.business-ballerina:build"
+testExamples.dependsOn ":whatsapp.business-ballerina:build"
+buildExamples.dependsOn ":whatsapp.business-ballerina:build"
