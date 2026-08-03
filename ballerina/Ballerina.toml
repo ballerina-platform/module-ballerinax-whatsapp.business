@@ -2,12 +2,11 @@
 distribution = "2201.12.0"
 org = "ballerinax"
 name = "whatsapp.business"
-version = "2.0.0"
+version = "2.0.1"
 authors = ["Ballerina"]
 repository = "https://github.com/ballerina-platform/module-ballerinax-whatsapp.business"
 keywords = ["Communication/WhatsApp", "Cost/Freemium", "Vendor/Meta", "Area/Communication", "Type/Connector", "Type/Trigger"]
 icon = "icon.png"
-readme = "../README.md"
 license = ["Apache-2.0"]
 
 [build-options]
@@ -19,5 +18,5 @@ graalvmCompatible = true
 [[platform.java21.dependency]]
 groupId = "io.ballerinax"
 artifactId = "whatsapp.business-native"
-version = "2.0.0"
-path = "../native/build/libs/whatsapp.business-native-2.0.0.jar"
+version = "2.0.1"
+path = "../native/build/libs/whatsapp.business-native-2.0.1.jar"
