@@ -17,13 +17,10 @@
 # Configuration for the WhatsApp Business Cloud webhook `Listener`.
 @display {label: "Listener Config"}
 public type ListenerConfig record {|
-    # The verification token configured in the Meta App dashboard. Matched against
-    # `hub.verify_token` during the webhook subscription handshake before the `hub.challenge` is
-    # echoed back.
+    # The verification token configured in the Meta App dashboard.
     @display {label: "Verify Token"}
     string verifyToken;
-    # The Meta app secret. Every inbound notification is authenticated by validating the
-    # `X-Hub-Signature-256` header against the raw request body (HMAC-SHA256).
+    # The Meta app secret, used to verify inbound webhook notifications.
     @display {label: "App Secret"}
     string appSecret;
 |};
@@ -77,10 +74,8 @@ public type MessageStatusUpdate record {|
     json raw;
 |};
 
-# A `messages` webhook notification that carries one or more new inbound messages. Meta always
-# sends inbound messages and status updates as two mutually exclusive payload shapes under this
-# same field — never both together in the same notification — so this and `MessageStatuses`
-# are the two members of the `MessagesNotification` union `onMessages` takes.
+# A `messages` webhook notification carrying one or more inbound messages. See `MessagesNotification`
+# for how this relates to `MessageStatuses`.
 #
 # + phoneNumberId - The business phone number ID the notification relates to
 # + messages - The inbound messages
@@ -93,8 +88,8 @@ public type Messages record {|
     json raw;
 |};
 
-# A `messages` webhook notification that carries one or more outbound message status updates
-# (delivery/read receipts). See `Messages` for why this is a separate type.
+# A `messages` webhook notification carrying one or more outbound status updates (delivery/read
+# receipts). See `MessagesNotification` for how this relates to `Messages`.
 #
 # + phoneNumberId - The business phone number ID the notification relates to
 # + statuses - The status updates
@@ -107,9 +102,8 @@ public type MessageStatuses record {|
     json raw;
 |};
 
-# A `messages` webhook notification: either a batch of inbound messages (`Messages`) or a
-# batch of status updates (`MessageStatuses`) — Meta always sends these as two mutually
-# exclusive shapes under this one field, never both together. Narrow with
+# A `messages` webhook notification: either a batch of inbound messages (`Messages`) or a batch
+# of status updates (`MessageStatuses`), never both together. Narrow with
 # `notification is Messages` / `notification is MessageStatuses`.
 public type MessagesNotification Messages|MessageStatuses;
 
@@ -224,8 +218,7 @@ public type AccountUpdateRestriction record {|
     string remediation?;
 |};
 
-# A WABA account-lifecycle or compliance change: verification, violations, partner changes,
-# pricing-tier updates, restrictions, or disconnection. Only the sub-record matching `event` is
+# A WABA account-lifecycle or compliance change. Only the sub-record matching `event` is
 # populated; the rest are `()`.
 #
 # + wabaId - The WhatsApp Business Account ID the change relates to
