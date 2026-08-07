@@ -17,47 +17,40 @@
 # The service type a consumer implements to handle WhatsApp Business Cloud webhook events. Attach
 # an implementation to a `Listener` to receive notifications.
 #
-# There are ten possible handlers, one per webhook field the WhatsApp Business Cloud webhook
-# subscription can select. Unlike most Ballerina service types, none of them are required —
-# declare only the ones you care about; a field whose handler you did not declare (or a field
-# outside this closed set, e.g. `account_alerts`, `group_lifecycle_update`) is logged and dropped
-# rather than delivered anywhere.
+# There are ten possible handlers, one per webhook field the subscription can select. None are
+# required — declare only the ones you care about; a field whose handler you did not declare (or
+# a field outside this closed set) is logged and dropped rather than delivered anywhere.
 #
-# An eleventh, optional handler, `onError`, does not correspond to a webhook field. It is invoked
-# whenever one of the ten handlers above returns an `error` while being dispatched — the
-# notification has already been acknowledged to Meta by that point, so this is the only way to
-# react to a handler failure other than logging (which always happens regardless of whether
-# `onError` is declared).
+# An eleventh, optional handler, `onError`, does not correspond to a webhook field. It fires when
+# one of the ten handlers above returns an `error` while being dispatched — the notification has
+# already been acknowledged to Meta by that point, so this is the only way to react to a handler
+# failure other than logging (which always happens regardless of whether `onError` is declared).
 #
-# A compiler plugin validates every remote function you do declare on a `WhatsAppService`: its
-# name must be one of the eleven below, its parameter must match the documented event type, and it
-# must return `error?`. Anything else is a compile-time error.
+# A compiler plugin validates every remote function you do declare: its name must be one of the
+# eleven below, its parameter must match the documented event type, and it must return `error?`.
 #
-# - `remote function onMessages(MessagesNotification notification) returns error?` — Invoked once
-#   per `messages` webhook notification: either a batch of inbound messages or a batch of status
-#   updates. Meta always sends these as two mutually exclusive shapes under this one field, never
-#   both together; narrow with `notification is Messages` / `notification is MessageStatuses`.
-# - `remote function onAccountReviewUpdate(AccountReviewUpdate update) returns error?` —
-#   Invoked when a WhatsApp Business Account's review decision changes.
-# - `remote function onAccountUpdate(AccountUpdate update) returns error?` — Invoked on
-#   account-lifecycle and compliance changes (verification, violations, partner changes,
-#   pricing-tier updates, restrictions, disconnection).
-# - `remote function onBusinessCapabilityUpdate(BusinessCapabilityUpdate update) returns error?`
-#   — Invoked when a WABA's messaging or phone-number capability limits change.
+# - `remote function onMessages(MessagesNotification notification) returns error?` — Inbound
+#   messages or status updates; see `MessagesNotification` for narrowing.
+# - `remote function onAccountReviewUpdate(AccountReviewUpdate update) returns error?` — A WABA
+#   review decision changes.
+# - `remote function onAccountUpdate(AccountUpdate update) returns error?` — Account-lifecycle or
+#   compliance changes.
+# - `remote function onBusinessCapabilityUpdate(BusinessCapabilityUpdate update) returns error?` —
+#   A WABA's messaging or phone-number capability limits change.
 # - `remote function onMessageTemplateQualityUpdate(MessageTemplateQualityUpdate update) returns error?`
-#   — Invoked when a message template's quality score changes.
+#   — A message template's quality score changes.
 # - `remote function onMessageTemplateStatusUpdate(MessageTemplateStatusUpdate update) returns error?`
-#   — Invoked when a message template's status changes (approved, rejected, disabled, ...).
-# - `remote function onPhoneNumberNameUpdate(PhoneNumberNameUpdate update) returns error?` —
-#   Invoked when a business phone number's display-name review outcome is available.
-# - `remote function onPhoneNumberQualityUpdate(PhoneNumberQualityUpdate update) returns error?`
-#   — Invoked when a business phone number's messaging throughput/quality tier changes.
-# - `remote function onSecurity(Security security) returns error?` — Invoked on
-#   two-step-verification PIN changes and reset requests for a business phone number.
-# - `remote function onTemplateCategoryUpdate(TemplateCategoryUpdate update) returns error?` —
-#   Invoked when a message template's category changes, or is about to change.
-# - `remote function onError(HandlerError handlerError) returns error?` — Invoked when any of the
-#   handlers above returns an error while being dispatched for an incoming notification.
+#   — A message template's status changes.
+# - `remote function onPhoneNumberNameUpdate(PhoneNumberNameUpdate update) returns error?` — A
+#   phone number's display-name review outcome is available.
+# - `remote function onPhoneNumberQualityUpdate(PhoneNumberQualityUpdate update) returns error?` —
+#   A phone number's messaging throughput/quality tier changes.
+# - `remote function onSecurity(Security security) returns error?` — A two-step-verification PIN
+#   change or reset request for a phone number.
+# - `remote function onTemplateCategoryUpdate(TemplateCategoryUpdate update) returns error?` — A
+#   message template's category changes, or is about to change.
+# - `remote function onError(HandlerError handlerError) returns error?` — Any handler above
+#   returned an error while being dispatched.
 public type WhatsAppService distinct service object {
     // remote function onMessages(MessagesNotification notification) returns error?;
     // remote function onAccountReviewUpdate(AccountReviewUpdate update) returns error?;

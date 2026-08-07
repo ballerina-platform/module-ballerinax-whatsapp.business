@@ -84,7 +84,6 @@ public type MediaObject record {|
 |};
 
 # A text message.
-#
 # See Meta's [text messages guide](https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/text-messages).
 public type TextMessage record {|
     # Always `whatsapp`
@@ -102,7 +101,6 @@ public type TextMessage record {|
 |};
 
 # An image message.
-#
 # See Meta's [image messages guide](https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/image-messages).
 public type ImageMessage record {|
     # Always `whatsapp`
@@ -120,7 +118,6 @@ public type ImageMessage record {|
 |};
 
 # An audio message.
-#
 # See Meta's [audio messages guide](https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/audio-messages).
 public type AudioMessage record {|
     # Always `whatsapp`
@@ -138,7 +135,6 @@ public type AudioMessage record {|
 |};
 
 # A video message.
-#
 # See Meta's [video messages guide](https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/video-messages).
 public type VideoMessage record {|
     # Always `whatsapp`
@@ -156,7 +152,6 @@ public type VideoMessage record {|
 |};
 
 # A document message.
-#
 # See Meta's [document messages guide](https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/document-messages).
 public type DocumentMessage record {|
     # Always `whatsapp`
@@ -174,7 +169,6 @@ public type DocumentMessage record {|
 |};
 
 # A location message.
-#
 # See Meta's [location messages guide](https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/location-messages).
 public type LocationMessage record {|
     # Always `whatsapp`
@@ -288,7 +282,6 @@ public type Contact record {|
 |};
 
 # A message sharing one or more contact cards.
-#
 # See Meta's [contacts messages guide](https://developers.facebook.com/docs/whatsapp/cloud-api/messages/contacts-messages).
 public type ContactMessage record {|
     # Always `whatsapp`
@@ -365,10 +358,8 @@ public type TemplateObject record {|
     TemplateComponent[] components?;
 |};
 
-# A pre-approved template message. Required for messages sent outside the 24-hour customer service
-# window (e.g. the first message in a conversation).
-#
-# See Meta's [messages reference](https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages) for the template message payload shape.
+# A pre-approved template message, required outside the 24-hour customer service window (e.g. the
+# first message in a conversation). See Meta's [messages reference](https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages).
 public type TemplateMessage record {|
     # Always `whatsapp`
     string messaging_product = MESSAGING_PRODUCT_WHATSAPP;
