@@ -16,10 +16,20 @@
  * under the License.
  */
 
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
+
+abstract class ExecHelper {
+    @Inject
+    abstract ExecOperations getExecOperations()
+}
+
+def execHelper = project.objects.newInstance(ExecHelper)
+
 task testExamples {
     doLast {
         try {
-            exec {
+            execHelper.execOperations.exec {
                 workingDir project.projectDir
                 println("Working dir: ${workingDir}")
                 // 'bash' (not 'cmd') on every OS: the script is a Bash script, and Windows CI
@@ -41,7 +51,7 @@ task buildExamples {
     }
     doLast {
         try {
-            exec {
+            execHelper.execOperations.exec {
                 workingDir project.projectDir
                 println("Working dir: ${workingDir}")
                 commandLine 'bash', "-c", "chmod +x ./build.sh && ./build.sh build"
