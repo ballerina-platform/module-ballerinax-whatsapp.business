@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/ballerina-platform/module-ballerinax-whatsapp.business/actions/workflows/ci.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerinax-whatsapp.business/actions/workflows/ci.yml)
 [![GraalVM Check](https://github.com/ballerina-platform/module-ballerinax-whatsapp.business/actions/workflows/build-with-bal-test-graalvm.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerinax-whatsapp.business/actions/workflows/build-with-bal-test-graalvm.yml)
-[![Trivy](https://github.com/ballerina-platform/module-ballerinax-whatsapp.business/actions/workflows/trivy-scan.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerinax-whatsapp.business/actions/workflows/trivy-scan.yml)
+[![Security Scan](https://github.com/ballerina-platform/module-ballerinax-whatsapp.business/actions/workflows/security-scan.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerinax-whatsapp.business/actions/workflows/security-scan.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 [WhatsApp Business Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api) is Meta's hosted API for sending and receiving WhatsApp messages, managing business phone numbers, message templates, and more, over the Meta Graph API.
